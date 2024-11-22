@@ -288,80 +288,13 @@ Each provider includes performance tracking:
 4. Push to the branch
 5. Create a Pull Request
 
-## Known Issues
-
-- Some providers may have rate limits
-- Generation times can vary by provider
-- API keys must be obtained separately
-
-## Release Notes
-
-See [CHANGELOG.md](CHANGELOG.md) for detailed release notes.
-
-### 0.0.2
-- Added NVIDIA Consistory support
-- Implemented Groq AI prompt enhancement
-- Added multiple image formats
-- Improved error handling
-- Added performance tracking
-
-### 0.0.1
-- Initial release
-- Basic provider support
-- Image generation functionality
-
-## Publishing
-
-To publish this extension to the VS Code Marketplace:
-
-1. Install vsce (VS Code Extension Manager):
-```bash
-npm install -g @vscode/vsce
-```
-
-2. Create a Personal Access Token (PAT):
-   - Go to https://dev.azure.com
-   - Create a new organization or select existing
-   - Click on User Settings (top right)
-   - Select Personal Access Tokens
-   - Click New Token
-   - Set Organization to "All accessible organizations"
-   - Set Scopes to "Marketplace > Manage"
-   - Copy the token - you'll need it for publishing
-
-3. Login to vsce:
-```bash
-vsce login <publisher-name>
-```
-
-4. Package the extension:
-```bash
-vsce package
-```
-
-5. Publish to Marketplace:
-```bash
-vsce publish
-```
-
-Note: Make sure to update the following in package.json before publishing:
-- "publisher": Set to your marketplace publisher name
-- "repository": Update with your actual repository URL
-- "version": Ensure it matches your CHANGELOG.md
-
-## Support
-
-For support, please:
-1. Check the documentation
-2. Look for existing issues
-3. Create a new issue if needed
-
 ## License
 
-This extension is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 
+Special thanks to:
 - OpenAI for DALL-E API
 - Stability AI for Stable Diffusion
 - Together AI for their SDK
@@ -374,6 +307,8 @@ This extension is licensed under the MIT License. See the LICENSE file for detai
 
 This extension:
 - Does not collect user data
-- Only sends prompts to selected AI providers
-- Stores API keys locally
-- Saves images only in user-specified locations
+- Does not share API keys
+- Only communicates with specified AI providers
+- Stores configuration locally
+
+For more details, see our [Privacy Policy](SECURITY.md#privacy).
