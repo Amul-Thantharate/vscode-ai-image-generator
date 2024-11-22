@@ -113,43 +113,6 @@ You can also configure them directly in VS Code settings:
 - Flexible size options
 - Fast generation times
 
-Configuration:
-```json
-{
-    "ai-image-generator.replicateApiToken": "YOUR_REPLICATE_TOKEN"
-}
-```
-
-Example Usage:
-```javascript
-// Example prompt with style and size options
-{
-    "provider": "replicate",
-    "prompt": "a wildlife photography photo of a red panda using a laptop in a snowy forest",
-    "options": {
-        "size": "1365x1024",
-        "style": "photography"  // Available styles: photography, digital-art, anime, sketch, etc.
-    }
-}
-```
-
-Style Examples:
-- `photography`: Realistic photographic style
-- `digital-art`: Digital artwork style
-- `anime`: Anime/manga style
-- `sketch`: Hand-drawn sketch style
-- `3d-render`: 3D rendered style
-- `pixel-art`: Retro pixel art style
-- `oil-painting`: Classical oil painting style
-- `watercolor`: Watercolor painting style
-- `any`: Let the model choose the best style
-
-Size Options:
-- `1024x1024`: Standard square format
-- `1365x1024`: Landscape format (4:3)
-- `1024x1365`: Portrait format (3:4)
-- `1920x1080`: HD landscape format (16:9)
-
 ### Prompt Enhancement
 
 The Groq AI prompt enhancement feature can improve your results by:
