@@ -1,0 +1,111 @@
+{
+    "name": "ai-image-generator",
+    "displayName": "AI Image Generator",
+    "description": "Generate AI images directly within VS Code using multiple providers including OpenAI DALL-E, Stable Diffusion, Together AI, NVIDIA Consistory, and AirForce",
+    "version": "0.0.2",
+    "publisher": "your-publisher-name",
+    "private": false,
+    "license": "MIT",
+    "icon": "images/Image.png",
+    "galleryBanner": {
+        "color": "#FF6B6B",
+        "theme": "dark"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/yourusername/vscode-ai-image-generator"
+    },
+    "engines": {
+        "vscode": "^1.85.0"
+    },
+    "categories": [
+        "Other",
+        "Machine Learning",
+        "Visualization"
+    ],
+    "keywords": [
+        "ai",
+        "image generation",
+        "dall-e",
+        "stable diffusion",
+        "nvidia",
+        "together ai",
+        "airforce",
+        "groq",
+        "artificial intelligence"
+    ],
+    "activationEvents": [],
+    "main": "./src/extension.js",
+    "contributes": {
+        "commands": [
+            {
+                "command": "ai-image-generator.generate",
+                "title": "AI: Generate Image"
+            },
+            {
+                "command": "ai-image-generator.configure",
+                "title": "AI: Configure API Keys"
+            }
+        ],
+        "configuration": {
+            "title": "AI Image Generator",
+            "properties": {
+                "ai-image-generator.openaiApiKey": {
+                    "type": "string",
+                    "default": "",
+                    "description": "API key for OpenAI DALL-E"
+                },
+                "ai-image-generator.stableDiffusionApiKey": {
+                    "type": "string",
+                    "default": "",
+                    "description": "API key for Stable Diffusion"
+                },
+                "ai-image-generator.togetherApiKey": {
+                    "type": "string",
+                    "default": "",
+                    "description": "API key for Together AI"
+                },
+                "ai-image-generator.nvidiaApiKey": {
+                    "type": "string",
+                    "default": "",
+                    "description": "API key for NVIDIA Consistory AI"
+                },
+                "ai-image-generator.groqApiKey": {
+                    "type": "string",
+                    "default": "",
+                    "description": "API key for Groq AI (optional - for prompt enhancement)"
+                },
+                "ai-image-generator.saveDirectory": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Directory to save generated images"
+                }
+            }
+        }
+    },
+    "scripts": {
+        "lint": "eslint .",
+        "pretest": "npm run lint",
+        "test": "node ./test/runTest.js"
+    },
+    "devDependencies": {
+        "@types/vscode": "^1.85.0",
+        "@types/glob": "^8.1.0",
+        "@types/mocha": "^10.0.6",
+        "@types/node": "20.x",
+        "eslint": "^8.56.0",
+        "glob": "^10.3.10",
+        "mocha": "^10.2.0",
+        "typescript": "^5.3.3",
+        "@vscode/test-electron": "^2.3.8"
+    },
+    "dependencies": {
+        "axios": "^1.6.7",
+        "dotenv": "^16.4.1",
+        "form-data": "^4.0.0",
+        "groq-sdk": "^0.3.0",
+        "jimp": "^0.22.10",
+        "openai": "^4.26.0",
+        "together-ai": "^0.1.0"
+    }
+}

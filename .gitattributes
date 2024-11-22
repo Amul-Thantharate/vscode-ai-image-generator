@@ -1,0 +1,27 @@
+# Auto detect text files and perform LF normalization
+* text=auto eol=lf
+
+# JS and TS files must always use LF for tools to work
+*.js text eol=lf
+*.ts text eol=lf
+*.json text eol=lf
+
+# Documentation
+*.md text diff=markdown
+*.txt text
+*.svg text
+
+# VS Code files
+.vscode/*.json text
+
+# Graphics
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.webp binary
+
+# Exclude files from exporting
+.gitattributes export-ignore
+.gitignore export-ignore
+.github export-ignore
