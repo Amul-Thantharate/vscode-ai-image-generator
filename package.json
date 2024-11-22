@@ -55,6 +55,11 @@
                     "default": "",
                     "description": "API key for OpenAI DALL-E"
                 },
+                "ai-image-generator.replicateApiToken": {
+                    "type": "string",
+                    "default": "",
+                    "description": "API token for Replicate"
+                },
                 "ai-image-generator.stableDiffusionApiKey": {
                     "type": "string",
                     "default": "",
@@ -100,12 +105,13 @@
         "@vscode/test-electron": "^2.3.8"
     },
     "dependencies": {
-        "axios": "^1.6.7",
-        "dotenv": "^16.4.1",
+        "axios": "^1.6.5",
+        "dotenv": "^16.3.1",
         "form-data": "^4.0.0",
         "groq-sdk": "^0.3.0",
         "jimp": "^0.22.10",
-        "openai": "^4.26.0",
-        "together-ai": "^0.1.0"
+        "openai": "^4.24.7",
+        "replicate": "^0.25.2",
+        "together-ai": "^0.2.8"
     }
 }
