@@ -4,7 +4,7 @@ const fs = require('fs');
 const Jimp = require('jimp');
 const dotenv = require('dotenv');
 const providers = require('./providers');
-const axios = require('axios'); // Added axios import
+const axios = require('axios');
 
 dotenv.config();
 
@@ -25,11 +25,28 @@ function activate(context) {
 
         if (!provider) return;
 
-        // Check if API keys are configured (skip for AirForce)
-        const needsApiKey = provider !== 'AirForce (Free)';
-        if (needsApiKey && !validateAPIKeys(config)) {
-            vscode.window.showErrorMessage('Please configure your API keys first using the "AI: Configure API Keys" command.');
-            return;
+        // Handle API key for selected provider
+        let apiKey = null;
+        if (provider !== 'AirForce (Free)') {
+            const configKey = getConfigKeyForProvider(provider);
+            apiKey = config.get(configKey);
+            
+            // If no API key is found, prompt for one
+            if (!apiKey) {
+                apiKey = await vscode.window.showInputBox({
+                    prompt: `Please enter your ${provider} API key`,
+                    password: true,
+                    validateInput: text => {
+                        return text && text.length > 0 ? null : 'API key is required';
+                    }
+                });
+
+                if (!apiKey) return; // User cancelled
+
+                // Save the API key
+                await config.update(configKey, apiKey, true);
+                vscode.window.showInformationMessage(`${provider} API key saved successfully!`);
+            }
         }
 
         // Get the prompt
@@ -42,7 +59,7 @@ function activate(context) {
 
         // Ask if user wants to enhance the prompt (skip for AirForce)
         let finalPrompt = prompt;
-        if (needsApiKey) {
+        if (provider !== 'AirForce (Free)') {
             const shouldEnhance = await vscode.window.showQuickPick(
                 ['Yes', 'No'],
                 {
@@ -52,103 +69,77 @@ function activate(context) {
             );
 
             if (shouldEnhance === 'Yes') {
-                const groqKey = config.get('groqApiKey');
-                if (!groqKey) {
-                    const useGroqAnyway = await vscode.window.showQuickPick(
-                        ['Yes', 'No'],
-                        {
-                            placeHolder: 'Groq API key not found. Configure it now?',
-                            title: 'Configure Groq API'
-                        }
-                    );
-                    
-                    if (useGroqAnyway === 'Yes') {
-                        await vscode.commands.executeCommand('ai-image-generator.configure');
-                        return;
+                try {
+                    const groqKey = config.get('groqApiKey');
+                    if (!groqKey) {
+                        const key = await vscode.window.showInputBox({
+                            prompt: 'Please enter your Groq AI API key for prompt enhancement',
+                            password: true,
+                            validateInput: text => {
+                                return text && text.length > 0 ? null : 'API key is required';
+                            }
+                        });
+                        if (!key) return;
+                        await config.update('groqApiKey', key, true);
                     }
-                } else {
-                    vscode.window.showInformationMessage('Enhancing prompt with Groq AI...');
-                    finalPrompt = await providers.enhancePromptWithGroq(prompt, groqKey);
+                    finalPrompt = await providers.enhancePromptWithGroq(prompt, groqKey || config.get('groqApiKey'));
                     vscode.window.showInformationMessage(`Enhanced prompt: ${finalPrompt}`);
+                } catch (error) {
+                    vscode.window.showErrorMessage('Failed to enhance prompt: ' + error.message);
+                    return;
                 }
             }
         }
 
-        try {
-            let imageUrl;
-            
-            switch (provider) {
-                case 'OpenAI DALL-E':
-                    imageUrl = await providers.generateWithOpenAI(finalPrompt, config.get('openaiApiKey'), context);
-                    break;
-                case 'Stable Diffusion':
-                    imageUrl = await providers.generateWithStableDiffusion(finalPrompt, config.get('stableDiffusionApiKey'));
-                    break;
-                case 'Together AI':
-                    imageUrl = await providers.generateWithTogetherAI(finalPrompt, config.get('togetherApiKey'));
-                    break;
-                case 'NVIDIA Consistory':
-                    imageUrl = await providers.generateWithNvidia(finalPrompt, config.get('nvidiaApiKey'));
-                    break;
-                case 'AirForce (Free)':
-                    vscode.window.showInformationMessage('Using AirForce free image generation service...');
-                    imageUrl = await providers.generateWithAirForce(finalPrompt);
-                    break;
-            }
+        // Show progress during generation
+        vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: "Generating image...",
+            cancellable: false
+        }, async (progress) => {
+            try {
+                let imageUrl;
+                switch (provider) {
+                    case 'OpenAI DALL-E':
+                        imageUrl = await providers.generateWithOpenAI(finalPrompt, apiKey);
+                        break;
+                    case 'Stable Diffusion':
+                        imageUrl = await providers.generateWithStableDiffusion(finalPrompt, apiKey);
+                        break;
+                    case 'Together AI':
+                        imageUrl = await providers.generateWithTogetherAI(finalPrompt, apiKey);
+                        break;
+                    case 'NVIDIA Consistory':
+                        imageUrl = await providers.generateWithNvidia(finalPrompt, apiKey);
+                        break;
+                    case 'AirForce (Free)':
+                        imageUrl = await providers.generateWithAirForce(finalPrompt);
+                        break;
+                    default:
+                        throw new Error('Unsupported provider');
+                }
 
-            if (imageUrl) {
-                await saveImage(imageUrl, finalPrompt, config.get('saveDirectory'), context);
-                vscode.window.showInformationMessage('Image generated successfully!');
+                if (imageUrl) {
+                    await saveImage(imageUrl, finalPrompt, config.get('saveDirectory'), context);
+                    vscode.window.showInformationMessage('Image generated successfully!');
+                }
+            } catch (error) {
+                vscode.window.showErrorMessage(`Error generating image: ${error.message}`);
             }
-        } catch (error) {
-            vscode.window.showErrorMessage(`Error generating image: ${error.message}`);
-        }
+        });
     });
 
-    const configureCommand = vscode.commands.registerCommand('ai-image-generator.configure', async () => {
-        const config = vscode.workspace.getConfiguration('ai-image-generator');
-        
-        const openaiKey = await vscode.window.showInputBox({
-            prompt: 'Enter your OpenAI API Key',
-            value: config.get('openaiApiKey')
-        });
+    context.subscriptions.push(generateCommand);
+}
 
-        const stableDiffusionKey = await vscode.window.showInputBox({
-            prompt: 'Enter your Stable Diffusion API Key',
-            value: config.get('stableDiffusionApiKey')
-        });
-
-        const togetherKey = await vscode.window.showInputBox({
-            prompt: 'Enter your Together AI API Key',
-            value: config.get('togetherApiKey')
-        });
-
-        const nvidiaKey = await vscode.window.showInputBox({
-            prompt: 'Enter your NVIDIA API Key',
-            value: config.get('nvidiaApiKey')
-        });
-
-        const groqKey = await vscode.window.showInputBox({
-            prompt: 'Enter your Groq API Key (Optional - for prompt enhancement)',
-            value: config.get('groqApiKey')
-        });
-
-        const saveDir = await vscode.window.showInputBox({
-            prompt: 'Enter directory path to save images',
-            value: config.get('saveDirectory')
-        });
-
-        await config.update('openaiApiKey', openaiKey, true);
-        await config.update('stableDiffusionApiKey', stableDiffusionKey, true);
-        await config.update('togetherApiKey', togetherKey, true);
-        await config.update('nvidiaApiKey', nvidiaKey, true);
-        await config.update('groqApiKey', groqKey, true);
-        await config.update('saveDirectory', saveDir, true);
-
-        vscode.window.showInformationMessage('API keys configured successfully!');
-    });
-
-    context.subscriptions.push(generateCommand, configureCommand);
+function getConfigKeyForProvider(provider) {
+    const keyMap = {
+        'OpenAI DALL-E': 'openaiApiKey',
+        'Stable Diffusion': 'stableDiffusionApiKey',
+        'Together AI': 'togetherApiKey',
+        'NVIDIA Consistory': 'nvidiaApiKey'
+    };
+    return keyMap[provider];
 }
 
 function validateAPIKeys(config) {
