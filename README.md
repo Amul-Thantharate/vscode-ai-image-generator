@@ -10,6 +10,7 @@ Generate AI-powered images directly within Visual Studio Code using multiple lea
   - Together AI (Paid)
   - NVIDIA Consistory (Paid)
   - AirForce (Free)
+  - Replicate (Paid)
 
 - 🚀 Smart Prompt Enhancement:
   - Optional Groq AI-powered prompt enhancement
@@ -53,12 +54,14 @@ Configure your API keys using the "AI: Configure API Keys" command:
 3. Together AI API Key
 4. NVIDIA API Key
 5. Groq API Key (optional - for prompt enhancement)
+6. Replicate API Token
 
 You can also configure them directly in VS Code settings:
 
 ```json
 {
   "ai-image-generator.openaiApiKey": "your-key",
+  "ai-image-generator.replicateApiToken": "YOUR_REPLICATE_TOKEN",
   "ai-image-generator.stableDiffusionApiKey": "your-key",
   "ai-image-generator.togetherApiKey": "your-key",
   "ai-image-generator.nvidiaApiKey": "your-key",
@@ -103,6 +106,49 @@ You can also configure them directly in VS Code settings:
 - No API key required
 - Quick results
 - Great for testing
+
+#### Replicate (recraft-v3)
+- High-quality image generation
+- Custom style support
+- Flexible size options
+- Fast generation times
+
+Configuration:
+```json
+{
+    "ai-image-generator.replicateApiToken": "YOUR_REPLICATE_TOKEN"
+}
+```
+
+Example Usage:
+```javascript
+// Example prompt with style and size options
+{
+    "provider": "replicate",
+    "prompt": "a wildlife photography photo of a red panda using a laptop in a snowy forest",
+    "options": {
+        "size": "1365x1024",
+        "style": "photography"  // Available styles: photography, digital-art, anime, sketch, etc.
+    }
+}
+```
+
+Style Examples:
+- `photography`: Realistic photographic style
+- `digital-art`: Digital artwork style
+- `anime`: Anime/manga style
+- `sketch`: Hand-drawn sketch style
+- `3d-render`: 3D rendered style
+- `pixel-art`: Retro pixel art style
+- `oil-painting`: Classical oil painting style
+- `watercolor`: Watercolor painting style
+- `any`: Let the model choose the best style
+
+Size Options:
+- `1024x1024`: Standard square format
+- `1365x1024`: Landscape format (4:3)
+- `1024x1365`: Portrait format (3:4)
+- `1920x1080`: HD landscape format (16:9)
 
 ### Prompt Enhancement
 
@@ -225,6 +271,7 @@ This extension is licensed under the MIT License. See the LICENSE file for detai
 - NVIDIA for Consistory API
 - Groq AI for prompt enhancement
 - AirForce for free image generation
+- Replicate for recraft-v3 API
 
 ## Privacy
 
